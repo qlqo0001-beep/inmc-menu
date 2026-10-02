@@ -1,0 +1,52 @@
+name: inmc-menu
+version: '${version}'
+main: com.inmc.menu.MenuPlugin
+api-version: '${apiVersion}'   # build.gradle.kts 의 inmc { paper } 에서 유도됨
+description: INMC 플레이어 메뉴 - Shift+F 서버 메뉴 · 개인 설정 · 스폰 · 랜덤 TP · 출석
+authors: [ INMC ]
+
+# 다른 inmc 플러그인에는 기대지 않는다 — 버튼은 명령어로 그 기능을 연다. 개인 설정은 core PlayerSettings 로만 만난다.
+# 연동은 전부 load: OMIT 이다. BEFORE 를 걸면 Paper 가 의존성 순환을 보고 우리 간선을
+# 조용히 끊는다 (가이드 함정 1).
+dependencies:
+  server:
+    # 필수 의존은 이것 하나뿐. core 가 kotlin-stdlib 과 공용 프레임워크를 들고 있다.
+    # join-classpath 없이는 클래스가 보이지 않는다.
+    inmc-core:      { load: BEFORE, required: true,  join-classpath: true }
+    PlaceholderAPI: { load: OMIT,   required: false, join-classpath: true }
+    WorldGuard:     { load: OMIT,   required: false, join-classpath: true }
+    Lands:          { load: OMIT,   required: false, join-classpath: true }
+    MMOItems:       { load: OMIT,   required: false, join-classpath: true }
+    MythicLib:      { load: OMIT,   required: false, join-classpath: true }
+    ItemsAdder:     { load: OMIT,   required: false, join-classpath: true }
+
+# commands 절은 paper-plugin.yml 에 없다 - Brigadier 로 등록한다.
+
+permissions:
+  inmcmenu.use:
+    description: 메뉴 열기(Shift+F · /메뉴) · 개인 설정
+    default: true
+  inmcmenu.spawn:
+    description: /스폰
+    default: true
+  inmcmenu.rtp:
+    description: /야생 — 랜덤 TP
+    default: true
+  inmcmenu.attendance:
+    description: /출석
+    default: true
+  inmcmenu.rtp.bypass:
+    description: 랜덤 TP 의 쿨타임·비용 면제
+    default: op
+  inmcmenu.admin:
+    description: 메뉴 편집 · 스폰/랜덤 TP/출석 관리 · 리로드 · 검증
+    default: op
+  inmcmenu.setting.time:
+    description: 개인 설정 — 개인 시간
+    default: true
+  inmcmenu.setting.weather:
+    description: 개인 설정 — 개인 날씨
+    default: true
+  inmcmenu.setting.hide-players:
+    description: 개인 설정 — 다른 플레이어 숨기기(관리자가 정한 월드에서만)
+    default: true
