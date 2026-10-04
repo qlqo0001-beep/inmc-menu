@@ -33,6 +33,7 @@ class SpawnCommand(private val hub: Hub) {
                 player(ctx)?.let { player ->
                     val point = SpawnPoint.of(player.location)
                     hub.spawn.update { it.copy(point = point) }
+                    hub.spawn.mirrorToCmi(player)
                     hub.messages.send(player, "spawn-set", Ph.of().value(point.describe()))
                 }
                 1

@@ -26,6 +26,7 @@ class SpawnAdminMenu(hub: Hub, viewer: Player) : Menu(hub, viewer, SIZE, "스폰
                 return@set
             }
             hub.spawn.update { it.copy(point = SpawnPoint.of(viewer.location)) }
+            hub.spawn.mirrorToCmi(viewer)
             hub.messages.send(viewer, "spawn-set", Ph.of().value(SpawnPoint.of(viewer.location).describe()))
             refresh()
         }
