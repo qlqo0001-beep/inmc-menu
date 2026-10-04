@@ -25,7 +25,7 @@ object Actions {
                         .onFailure { hub.logger.warning("메뉴 명령어 실행 실패 (${action.command}): ${it.message}") }
                     is Action.OpenMenu -> openMenu(hub, player, action.menu)
                     is Action.OpenScreen -> openScreen(hub, player, action.screen)
-                    is Action.Message -> player.sendMessage(Text.render(action.text, Ph.of().player(player.name), player))
+                    is Action.Message -> player.sendMessage(Text.render(action.text, Ph.of().player(kr.inmc.core.integration.TitleForgeNames.displayName(player.uniqueId, player.name)), player))
                     Action.Close -> player.closeInventory()
                 }
             }
