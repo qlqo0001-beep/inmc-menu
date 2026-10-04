@@ -58,6 +58,9 @@ class ManageMenu(hub: Hub, viewer: Player, private var page: Int = 0) : Menu(hub
             if (!hub.art.refresh(viewer)) hub.messages.send(viewer, "art-busy")
             refresh()
         }
+        set(SLOT_HUB, Icon.of(Material.COMPASS, "<gold>어드민 메뉴로</gold>", "<gray>각 플러그인 설정 허브로 돌아갑니다.</gray>")) {
+            viewer.performCommand("메뉴 어드민")
+        }
 
         fillEmpty(Icon.FILLER)
         pager(page, menus.size, PER_PAGE) { page = it; refresh() }
@@ -125,6 +128,7 @@ class ManageMenu(hub: Hub, viewer: Player, private var page: Int = 0) : Menu(hub
         const val SLOT_PACK = 49
         const val SLOT_HIDE = 50
         const val SLOT_ART = 51
+        const val SLOT_HUB = 52
     }
 }
 
