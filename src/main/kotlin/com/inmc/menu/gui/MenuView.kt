@@ -34,7 +34,7 @@ class MenuView(
 
     override fun draw() {
         clear()
-        val ph = Ph.of().player(viewer.name).playtime(playtime(viewer))
+        val ph = Ph.of().player(kr.inmc.core.integration.TitleForgeNames.displayName(viewer.uniqueId, viewer.name)).playtime(playtime(viewer))
         for (button in def.buttons) {
             val allowed = button.permission.isBlank() || viewer.hasPermission(button.permission)
             if (!allowed && button.hideLocked) continue

@@ -44,6 +44,24 @@ class SpawnService(private val hub: Hub) {
         save(config)
     }
 
+    /**
+     * CMI 스폰 미러 — `/스폰 설정`·관리 화면에서 자리를 정하면 CMI 스폰도 같은 곳으로 맞춘다.
+     * CMI 내부는 버전마다 바뀌어 리플렉션을 쓰지 않고, 안정된 명령어(`/setspawn`, 없으면 `cmi setspawn`)로
+     * 서 있는 자리에서 실행한다. 없어도 조용히 넘긴다. 반대 방향(CMI에서 직접 바꿈)은 미러하지 않는다 —
+     * 스폰 자리의 진실원천은 여기(spawn.yml) 하나다. CMI 쪽 접속·부활 자리는 끈 채로 둔다(GUIDE 참조).
+     */
+    fun mirrorToCmi(player: Player) {
+        if (!Bukkit.getPluginManager().isPluginEnabled("CMI")) return
+        val map = Bukkit.getServer().commandMap
+        val command = when {
+            map.getCommand("setspawn") != null -> "setspawn"
+            map.getCommand("cmi") != null -> "cmi setspawn"
+            else -> return
+        }
+        runCatching { player.performCommand(command) }
+            .onFailure { hub.logger.fine("CMI 스폰 미러 실패: ${it.message}") }
+    }
+
     private fun save(value: SpawnConfig) {
         val yaml = value.toYaml()
         hub.io.asyncRun { hub.io.save(file, yaml) }

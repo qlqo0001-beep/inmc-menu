@@ -78,3 +78,6 @@
 - CMI 의 `CustomAlias/CustomAlias.yml` 에 `스폰:` · `출석:` · `출석체크:` 가 있으면 우리 명령어와 겹친다 — 그 별칭을 지운다.
 - 접속·부활 자리를 여기서 정하면 CMI 의 `Spawn.SpawnOnJoin` · `Spawn.Main.RespawnLocation` · `Spawn.FirstSpawn.Use` 는 끈다
   (둘이 같은 사건을 고치면 나중 것이 이긴다).
+- 스폰 위치는 양방향이 아니라 **메뉴 → CMI 한 방향 미러**다: `/스폰 설정`·관리 화면에서 정하면 CMI 스폰도 같은 곳으로
+  맞춘다(서 있는 자리에서 CMI `setspawn` 실행 — CMI 없거나 권한이 없으면 조용히 넘김). CMI에서 직접 바꾸면
+  메뉴는 모른다. 스폰 자리의 진실원천은 `spawn.yml` 하나다.

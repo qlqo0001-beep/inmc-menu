@@ -2,6 +2,7 @@ package com.inmc.menu.command
 
 import com.inmc.menu.Hub
 import com.inmc.menu.MenuPlugin
+import com.inmc.menu.gui.AdminHubMenu
 import com.inmc.menu.gui.EditorMenu
 import com.inmc.menu.gui.ManageMenu
 import com.inmc.menu.gui.SettingsMenu
@@ -57,6 +58,7 @@ class MenuCommand(private val hub: Hub, private val plugin: MenuPlugin) {
                     }),
             )
             .then(Commands.literal("관리").requires(::isAdmin).executes { ctx -> player(ctx)?.let { ManageMenu(hub, it).show() }; 1 })
+            .then(Commands.literal("어드민").requires(::isAdmin).executes { ctx -> player(ctx)?.let { AdminHubMenu(hub, it).show() }; 1 })
             .then(Commands.literal("검증").requires(::isAdmin).executes { ctx -> player(ctx)?.let { com.inmc.menu.verify.Verifier(hub).run(it) }; 1 })
             .then(Commands.literal("리로드").requires(::isAdmin).executes { ctx ->
                 val sender = sender(ctx)

@@ -113,7 +113,7 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
                 "<gold>/출석</gold> <gray>- 출석</gray> <gray>· </gray><red>/출석 관리</red> <gray>· </gray><red>/출석 초기화 <플레이어> <판></red>",
                 "<gold>/스폰</gold> <gray>- 서버 스폰으로</gray> <gray>· </gray><red>/스폰 설정</red> <gray>· </gray><red>/스폰 관리</red>",
                 "<gold>/야생</gold> <gray>- 랜덤 이동(월드 고르기)</gray> <gray>· </gray><red>/야생 관리</red> <gray>· </gray><red>/야생 상태</red>",
-                "<red>/메뉴 편집 [메뉴]</red> <gray>· </gray><red>/메뉴 관리</red> <gray>· </gray><red>/메뉴 리로드</red> <gray>· </gray><red>/메뉴 검증</red>",
+                "<red>/메뉴 편집 [메뉴]</red> <gray>· </gray><red>/메뉴 관리</red> <gray>· </gray><red>/메뉴 어드민</red> <gray>· </gray><red>/메뉴 리로드</red> <gray>· </gray><red>/메뉴 검증</red>",
             ).joinToString("\n"),
         )
     }
