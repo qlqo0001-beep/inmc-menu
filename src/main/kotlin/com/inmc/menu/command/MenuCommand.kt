@@ -48,7 +48,13 @@ class MenuCommand(private val hub: Hub, private val plugin: MenuPlugin) {
     private fun menuTree(): LiteralArgumentBuilder<CommandSourceStack> =
         Commands.literal("메뉴").requires(::canUse)
             .executes { ctx -> player(ctx)?.let { Actions.openMain(hub, it) }; 1 }
-            .then(Commands.literal("도움말").executes { ctx -> hub.messages.send(sender(ctx), "help"); 1 })
+            .then(Commands.literal("도움말").executes { ctx ->
+                val sender = sender(ctx)
+                hub.messages.send(sender, "help")
+                // 관리자 줄은 권한이 있을 때만(2026-10-08).
+                if (sender.hasPermission(Hub.ADMIN)) hub.messages.send(sender, "help-admin")
+                1
+            })
             .then(
                 Commands.literal("편집").requires(::isAdmin)
                     .executes { ctx -> player(ctx)?.let { edit(it, hub.config.mainMenu) }; 1 }

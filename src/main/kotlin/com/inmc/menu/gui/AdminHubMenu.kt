@@ -45,6 +45,9 @@ class AdminHubMenu(hub: Hub, viewer: Player) : Menu(hub, viewer, SIZE, "<dark_gr
             Entry(Material.CHEST, "<yellow>랜덤박스</yellow>", "<gray>/urb 상자 목록(관리자)</gray>", "urb"),
             Entry(Material.PAPER, "<yellow>숫자게임 설정</yellow>", "<gray>/숫자게임 관리 화면</gray>", "숫자게임 관리"),
             Entry(Material.ZOMBIE_HEAD, "<red>몬스터 설정</red>", "<gray>/몹 gui 화면</gray>", "몹 gui"),
+            // 2026-10-08 — 던전·디스코드가 빠져 있었다.
+            Entry(Material.ENDER_EYE, "<light_purple>던전 설정</light_purple>", "<gray>/던전 관리 화면</gray>", "던전 관리 화면"),
+            Entry(Material.WRITABLE_BOOK, "<aqua>디스코드</aqua>", "<gray>/디스코드 관리 상태</gray>", "디스코드 관리 상태"),
         )
     }
 }

@@ -110,9 +110,14 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
             "help" to listOf(
                 "<gold>/메뉴</gold> <gray>· </gray><gold>Shift+F</gold> <gray>- 서버 메뉴</gray>",
                 "<gold>/설정</gold> <gray>- 개인 설정</gray>",
-                "<gold>/출석</gold> <gray>- 출석</gray> <gray>· </gray><red>/출석 관리</red> <gray>· </gray><red>/출석 초기화 <플레이어> <판></red>",
-                "<gold>/스폰</gold> <gray>- 서버 스폰으로</gray> <gray>· </gray><red>/스폰 설정</red> <gray>· </gray><red>/스폰 관리</red>",
-                "<gold>/야생</gold> <gray>- 랜덤 이동(월드 고르기)</gray> <gray>· </gray><red>/야생 관리</red> <gray>· </gray><red>/야생 상태</red>",
+                "<gold>/출석</gold> <gray>- 출석</gray>",
+                "<gold>/스폰</gold> <gray>- 서버 스폰으로</gray>",
+                "<gold>/야생</gold> <gray>- 랜덤 이동(월드 고르기)</gray>",
+            ).joinToString("\n"),
+            // 관리자 줄은 권한이 있을 때만(2026-10-08).
+            "help-admin" to listOf(
+                "<red>/출석 관리</red> <gray>· </gray><red>/출석 초기화 <플레이어> <판></red>",
+                "<red>/스폰 설정</red> <gray>· </gray><red>/스폰 관리</red> <gray>· </gray><red>/야생 관리</red> <gray>· </gray><red>/야생 상태</red>",
                 "<red>/메뉴 편집 [메뉴]</red> <gray>· </gray><red>/메뉴 관리</red> <gray>· </gray><red>/메뉴 어드민</red> <gray>· </gray><red>/메뉴 리로드</red> <gray>· </gray><red>/메뉴 검증</red>",
             ).joinToString("\n"),
         )
