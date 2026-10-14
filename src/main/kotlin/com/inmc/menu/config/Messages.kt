@@ -69,15 +69,6 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
             "rtp-marks-cleared" to "<green>{world} 의 실패 구역 기록을 지웠습니다.</green>",
             "rtp-saved" to "<green>{world} 랜덤 TP 설정을 저장했습니다.</green>",
 
-            // --- 스폰 ---------------------------------------------------------------
-            "spawn-title" to "<aqua><bold>{count}</bold></aqua>",
-            "spawn-subtitle" to "<gray>스폰으로 이동합니다 — 움직이지 마세요</gray>",
-            "spawn-done" to "<green>스폰으로 이동했습니다.</green>",
-            "spawn-cooldown" to "<red>{time} 뒤에 다시 쓸 수 있습니다.</red>",
-            "spawn-cancelled-move" to "<red>움직여서 이동을 취소했습니다.</red>",
-            "spawn-cancelled-damage" to "<red>공격받아 이동을 취소했습니다.</red>",
-            "spawn-set" to "<green>서버 스폰을 정했습니다: {value}</green>",
-
             // --- 출석 ---------------------------------------------------------------
             "attend-none" to "<gray>지금 열린 출석판이 없습니다.</gray>",
             "attend-loading" to "<gray>출석 기록을 읽는 중입니다 — 잠시 뒤에 다시 눌러 주세요.</gray>",
@@ -88,6 +79,7 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
             "attend-done-streak" to "{value} <green>출석 완료!</green> <gray>(연속 {count}일째)</gray>",
             "attend-done-total" to "{value} <green>출석 완료!</green> <gray>(총 {count}번째)</gray>",
             "attend-bonus" to "{value} <gold>— 이달 {count}일 출석 보상!</gold>",
+            "attend-mailed" to "<yellow>가방이 가득 차 보상 {count}개를 우편으로 보냈습니다 — /우편 에서 받으세요.</yellow>",
             "attend-pending" to "<yellow>가방이 가득 차 보상 {count}개를 보관했습니다 — /출석 에서 받으세요.</yellow>",
             "attend-claimed" to "<green>보관된 보상 {count}개를 받았습니다.</green>",
             "attend-claim-left" to "<yellow>가방이 가득 차 {count}개가 남았습니다.</yellow>",
@@ -111,13 +103,12 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
                 "<gold>/메뉴</gold> <gray>· </gray><gold>Shift+F</gold> <gray>- 서버 메뉴</gray>",
                 "<gold>/설정</gold> <gray>- 개인 설정</gray>",
                 "<gold>/출석</gold> <gray>- 출석</gray>",
-                "<gold>/스폰</gold> <gray>- 서버 스폰으로</gray>",
                 "<gold>/야생</gold> <gray>- 랜덤 이동(월드 고르기)</gray>",
             ).joinToString("\n"),
             // 관리자 줄은 권한이 있을 때만(2026-10-08).
             "help-admin" to listOf(
                 "<red>/출석 관리</red> <gray>· </gray><red>/출석 초기화 <플레이어> <판></red>",
-                "<red>/스폰 설정</red> <gray>· </gray><red>/스폰 관리</red> <gray>· </gray><red>/야생 관리</red> <gray>· </gray><red>/야생 상태</red>",
+                "<red>/야생 관리</red> <gray>· </gray><red>/야생 상태</red>",
                 "<red>/메뉴 편집 [메뉴]</red> <gray>· </gray><red>/메뉴 관리</red> <gray>· </gray><red>/메뉴 어드민</red> <gray>· </gray><red>/메뉴 리로드</red> <gray>· </gray><red>/메뉴 검증</red>",
             ).joinToString("\n"),
         )

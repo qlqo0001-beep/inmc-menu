@@ -37,6 +37,9 @@ class ModelTest {
         assertEquals(Action.Message("a: b: c"), Action.decode("message: a: b: c"), "값 안의 쌍점은 그대로")
         assertNull(Action.decode("nope: 1"))
         assertNull(Action.decode("screen: nowhere"))
+        // 옛 내장 화면 spawn(스폰은 inmc-essentials 로 옮겼다) — 버리지 않고 /스폰 명령 버튼으로 읽는다.
+        assertEquals(Action.PlayerCommand("스폰"), Action.decode("screen: spawn"))
+        assertEquals("player: 스폰", Action.decode("screen: Spawn")?.encode())
         assertNull(Action.decode("player:   "))
     }
 
@@ -69,7 +72,7 @@ class ModelTest {
             "main", "<white>서버 메뉴</white>", 6,
             listOf(
                 ButtonDef("spawn", 0, 1, 2, 2, "<green>스폰</green>", listOf("한 줄", "두 줄"), paper, "spawn", "x.y", true,
-                    listOf(Action.OpenScreen(Screen.SPAWN)), listOf(Action.PlayerCommand("스폰")), null),
+                    listOf(Action.OpenScreen(Screen.RTP)), listOf(Action.PlayerCommand("스폰")), null),
                 ButtonDef("profile", 4, 0, name = "{플레이어}", icon = paper, special = Special.PROFILE),
             ),
         )

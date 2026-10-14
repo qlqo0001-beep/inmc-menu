@@ -22,9 +22,12 @@
 
 7. **출석은 기록을 먼저 쓰고 보상**(그 자리에서, 원자적으로). 못 받은 보상 받기도 비운 목록을 먼저 쓴다. 순서를 바꾸면 꺼질 때 두 번 받는다.
 
-8. **부활은 엔드 귀환(`END_PORTAL`)을 건드리지 않는다.** 침대·앵커는 그 부활이 침대·앵커일 때만 "된다".
+8. **스폰은 여기 없다**(2026-10-10 inmc-essentials 로 옮김 — 부활·접속 자리·엔드 귀환 규칙도 그쪽 `SpawnListener`). 메뉴 버튼은 `/스폰` 명령만 부르고,
+   버튼의 플레이어 명령어는 **친 것으로** 돌린다(`Actions.asTyped` — `PlayerCommandPreprocessEvent` 를 쏘고 취소되지 않으면 `performCommand`). 맨
+   `performCommand` 로 바꾸면 essentials 명령 관문(`/스폰` 대기·쿨타임)을 건너뛰고, `player.chat` 으로 바꾸면 채팅을 '숨김' 으로 둔 사람의 메뉴가 다 죽는다.
+   옛 `screen: spawn` 은 `Action.of` 에서 `player: 스폰` 으로 읽는다 — 이 별칭을 지우면 옛 메뉴 파일의 스폰 버튼이 조용히 사라진다.
 
-9. **검증기는 메모리에서만 바꿨다 되돌린다**(`SpawnService.swap`, `hub.config` 대입 — 파일에 안 쓴다). 새 기능을 더하면 검사도 더한다.
+9. **검증기는 메모리에서만 바꿨다 되돌린다**(`hub.config` 대입·개인 설정 — 파일에 안 쓴다). 새 기능을 더하면 검사도 더한다.
 
 10. **메시지 키는 `Messages.DEFAULTS` 와 `messages.yml` 에 같이** — `ResourceTest` 가 둘이 같은지, 코드가 부르는 키가 다 있는지 본다.
     Kotlin 문자열에서 `$이름` 뒤에 한글을 바로 붙이지 말 것(`$count일` 은 `count일` 이라는 변수다) — `${count}일`.

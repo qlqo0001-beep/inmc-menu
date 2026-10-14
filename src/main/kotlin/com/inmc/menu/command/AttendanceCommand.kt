@@ -10,6 +10,7 @@ import com.mojang.brigadier.context.CommandContext
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents
+import kr.inmc.core.integration.Vanish
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -36,7 +37,8 @@ class AttendanceCommand(private val hub: Hub) {
                 .executes { ctx -> player(ctx)?.let { AttendanceAdminMenu(hub, it).show() }; 1 })
             .then(Commands.literal("초기화").requires { it.sender.hasPermission(Hub.ADMIN) }
                 .then(Commands.argument("플레이어", StringArgumentType.word())
-                    .suggests { _, builder -> Bukkit.getOnlinePlayers().forEach { builder.suggest(it.name) }; builder.buildFuture() }
+                    // 투명인 사람은 볼 수 있는 사람에게만 제안한다(core Vanish).
+                    .suggests { ctx, builder -> Vanish.visibleNames(ctx.source.sender).forEach { builder.suggest(it) }; builder.buildFuture() }
                     .then(Commands.argument("판", StringArgumentType.greedyString())
                         .suggests { _, builder -> hub.attendance.boards.forEach { builder.suggest(it.id) }; builder.buildFuture() }
                         .executes { ctx -> resetPlayer(ctx, StringArgumentType.getString(ctx, "플레이어"), StringArgumentType.getString(ctx, "판").trim()) })))

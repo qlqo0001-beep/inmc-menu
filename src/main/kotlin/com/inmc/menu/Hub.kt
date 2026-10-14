@@ -58,9 +58,6 @@ class Hub(override val plugin: JavaPlugin) : InmcHost {
 
     val rtp = com.inmc.menu.rtp.RtpService(this)
 
-    /** 서버 스폰 · `/스폰` · 접속·부활 자리(`spawn.yml`). */
-    val spawn = com.inmc.menu.spawn.SpawnService(this)
-
     /** 출석판(`attendance/`) · 사람마다의 기록(`attendance-data/<uuid>.yml`). */
     val attendance = com.inmc.menu.attend.AttendanceService(this)
 
@@ -105,12 +102,11 @@ class Hub(override val plugin: JavaPlugin) : InmcHost {
 
     companion object {
 
-        /** core PlayerStore 네임스페이스 — 쿨타임(`rtp-<월드>` · `spawn`). ARCHITECTURE 의 표에 있다. */
+        /** core PlayerStore 네임스페이스 — 쿨타임(`rtp-<월드>`). ARCHITECTURE 의 표에 있다. (`spawn` 열쇠는 2026-10-10 스폰을 inmc-essentials 로 옮기며 쓰지 않는다) */
         const val STORE = "menu"
 
         const val USE = "inmcmenu.use"
         const val ADMIN = "inmcmenu.admin"
-        const val SPAWN = "inmcmenu.spawn"
         const val RTP = "inmcmenu.rtp"
         const val RTP_BYPASS = "inmcmenu.rtp.bypass"
         const val ATTENDANCE = "inmcmenu.attendance"

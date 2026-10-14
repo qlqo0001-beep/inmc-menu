@@ -3,6 +3,7 @@ package com.inmc.menu.attend
 import com.inmc.menu.Hub
 import com.inmc.menu.menu.ButtonDef
 import com.inmc.menu.util.Ph
+import kr.inmc.core.integration.Mail
 import kr.inmc.core.util.Text
 import org.bukkit.Bukkit
 import org.bukkit.configuration.file.YamlConfiguration
@@ -19,7 +20,8 @@ import java.util.UUID
  * - **자동** 판: 접속하면(정한 분만큼 접속한 뒤) — 들어올 때 기록을 읽은 직후, 그리고 1분마다(날이 바뀐 것도 여기서 잡는다).
  * - **수동** 판: 출석 화면에서 오늘 칸을 눌러야. 들어올 때·날이 바뀔 때 "오늘 아직" 안내.
  * - 출석 순서: **기록을 먼저 쓰고**(그 자리에서) 보상을 준다 — 보상 뒤에 꺼지면 또 받는 것보다, 기록 뒤에 꺼져 못 받는 쪽이 낫다.
- *   가방이 차서 남은 아이템은 못 받은 보상에 넣고 한 번 더 쓴다.
+ *   가방이 차서 남은 아이템은 **우편**(core [Mail] — 공급처가 있을 때)으로, 없으면 못 받은 보상에 넣고 한 번 더 쓴다(2026-10-10).
+ *   이미 못 받은 보상에 든 것은 그대로 읽고 받을 수 있다.
  * - 하루 경계: `config.yml` 의 시간대·바뀌는 시각([Days]).
  */
 class AttendanceService(private val hub: Hub) {
@@ -181,13 +183,13 @@ class AttendanceService(private val hub: Hub) {
         // 1. 기록 먼저 — 그 자리에서.
         pd.records[board.id] = result.record
         write(pd)
-        // 2. 보상.
-        val before = pd.pending.size
-        give(player, pd, board.rewards[result.cell])
+        // 2. 보상. 가방에 안 들어간 것은 모아 두었다가 3 에서 한 번에.
+        val overflow = ArrayList<ItemStack>()
+        give(player, overflow, board.rewards[result.cell])
         for (count in result.bonuses) {
             val bonus = board.bonuses[count] ?: continue
             if (bonus.isEmpty()) continue
-            give(player, pd, bonus)
+            give(player, overflow, bonus)
             hub.messages.send(player, "attend-bonus", Ph.of().value(board.name).count(count))
         }
         val key = when (board.mode) {
@@ -196,10 +198,15 @@ class AttendanceService(private val hub: Hub) {
             Mode.TOTAL -> "attend-done-total"
         }
         hub.messages.send(player, key, Ph.of().value(board.name).count(result.count))
-        // 3. 못 받은 것이 생겼으면 한 번 더.
-        if (pd.pending.size > before) {
-            write(pd)
-            hub.messages.send(player, "attend-pending", Ph.of().count(pd.pending.size - before))
+        // 3. 못 받은 것 — 우편이 받으면 우편으로(둘 중 한 곳에만), 아니면 못 받은 보상에 넣고 한 번 더 쓴다.
+        if (overflow.isNotEmpty()) {
+            if (mail(player, overflow, Text.plain(board.name))) {
+                hub.messages.send(player, "attend-mailed", Ph.of().count(overflow.size))
+            } else {
+                pd.pending += overflow
+                write(pd)
+                hub.messages.send(player, "attend-pending", Ph.of().count(overflow.size))
+            }
         }
         return Outcome.DONE
     }
@@ -213,16 +220,25 @@ class AttendanceService(private val hub: Hub) {
         // 비운 목록을 먼저 쓴다 — 주다가 꺼지면 또 받는 것보다 잃는 쪽(출석과 같은 원칙). 남은 것은 아래에서 다시 쓴다.
         write(pd)
         var given = 0
+        val left = ArrayList<ItemStack>()
         for (stack in waiting) {
-            val left = player.inventory.addItem(stack).values
-            if (left.isEmpty()) given++ else pd.pending += left
+            val rest = player.inventory.addItem(stack).values
+            if (rest.isEmpty()) given++ else left += rest
         }
-        write(pd)
         hub.messages.send(player, "attend-claimed", Ph.of().count(given))
-        if (pd.pending.isNotEmpty()) hub.messages.send(player, "attend-claim-left", Ph.of().count(pd.pending.size))
+        if (left.isEmpty()) return
+        // 또 남은 것 — 우편이 받으면 우편으로(목록은 위에서 빈 채로 이미 썼다), 아니면 다시 목록에.
+        if (mail(player, left, null)) return hub.messages.send(player, "attend-mailed", Ph.of().count(left.size))
+        pd.pending += left
+        write(pd)
+        hub.messages.send(player, "attend-claim-left", Ph.of().count(pd.pending.size))
     }
 
-    private fun give(player: Player, pd: PlayerData, reward: Reward?) {
+    /** 가방에 안 들어간 출석 보상을 우편으로. 공급처가 없거나 거절하면 false — 부른 쪽이 못 받은 보상에 넣는다. */
+    private fun mail(player: Player, stacks: List<ItemStack>, board: String?): Boolean =
+        Mail.send(player.uniqueId, hub.plugin.name, if (board.isNullOrBlank()) "출석 보상" else "출석 보상 · $board", stacks)
+
+    private fun give(player: Player, overflow: MutableList<ItemStack>, reward: Reward?) {
         if (reward == null || reward.isEmpty()) return
         for (entry in reward.items) {
             var left = entry.amount
@@ -232,7 +248,7 @@ class AttendanceService(private val hub: Hub) {
                 if (stack.amount <= 0) break
                 left -= stack.amount
                 built++
-                pd.pending += player.inventory.addItem(stack).values
+                overflow += player.inventory.addItem(stack).values
             }
         }
         if (reward.money > 0) hub.economy.deposit(player, reward.money.toDouble())

@@ -2,6 +2,30 @@
 
 ---
 
+## 미배포 — 스폰을 inmc-essentials 로 옮김(2026-10-10)
+
+- 사용자 "스폰은 메뉴에서 빼서 새 플러그인으로": `spawn/`(SpawnConfig·SpawnService) · `SpawnListener` · `SpawnCommand`(`/스폰`·`/스폰 설정`·`/스폰 관리`) ·
+  `SpawnAdminMenu` · `WarmupListener` 의 스폰 줄 · 검증기의 부활 검사 2건 · 메시지 `spawn-*` 7개와 도움말 줄 · 권한 `inmcmenu.spawn` · `SpawnTest` 를 뺐다.
+  전부 inmc-essentials 의 spawn 기능으로 옮겼다(부활 순서에 침대 홈·기본 홈·워프 칸, 첫 스폰, 접속·부활 무적을 더해서 — 그쪽 `docs/spawn.md`).
+- **CMI 스폰 미러(`mirrorToCmi`)는 없앴다**(아래 "CMI 스폰 미러" 항목을 뒤집음) — CMI 를 대체하므로 미러할 곳이 없다.
+- 내장 화면 `spawn` 을 지웠다. 옛 메뉴 파일의 `screen: spawn` 은 **`player: 스폰` 명령 버튼으로 읽는다**(`Action.of` — 조용히 버려지는 대신, 다음 저장 때
+  `player: 스폰` 으로 적힌다). 기본 메뉴의 스폰 버튼도 `player: 스폰`. 버튼 그림 `spawn` 은 그대로.
+- `/스폰` 대기(3초)는 essentials commands 기능의 명령 대기로 건다. PlayerStore `menu:spawn` 쿨타임 열쇠는 더 쓰지 않는다(`menu:rtp-<월드>` 만).
+- **버튼의 플레이어 명령어는 친 것으로 돌린다**(`player.chat("/…")`, 전에는 `performCommand`) — `PlayerCommandPreprocessEvent` 를 거쳐야
+  essentials 명령 관문(대기·쿨타임·비용)이 걸린다. 그러지 않으면 Shift+F 메뉴의 스폰 버튼이 `/스폰` 대기를 건너뛴다(옛 메뉴는 3초 대기가 있었다).
+  다른 플러그인의 명령 막기(던전 안 명령 금지 등)도 버튼에 똑같이 걸린다.
+- **같은 재시작에 inmc-essentials 와 함께 바꿀 것** — 옛 메뉴 판과 essentials 가 같이 켜지면 `/스폰` 이 두 번 등록되고 접속·부활 자리를 둘이 고친다
+  (essentials 가 켤 때 경고한다).
+
+## 미배포 — 출석: 못 받은 보상은 우편으로 · 이름 제안에서 투명 숨김(2026-10-10)
+
+- CMI 대체(inmc-essentials)에 맞춰: 출석 보상 아이템이 가방에 안 들어가면 core 우편(`Mail` — 공급처가 있을 때)으로 보낸다
+  (출처 "출석 보상 · <판 이름>", 새 메시지 `attend-mailed`). 우편이 없으면 예전처럼 못 받은 보상 목록에 보관한다 — 둘 중 한 곳에만.
+  순서는 그대로: 기록을 먼저 쓰고 보상(CLAUDE.md 7).
+- 이미 보관된 못 받은 보상은 그대로 화면에서 받는다. 받다가 또 남으면 우편이 있으면 우편으로(목록은 비운 채로), 없으면 다시 목록에.
+- `/출석 초기화 <플레이어>` 의 이름 제안이 core `Vanish.visibleNames` — 투명인 사람은 볼 수 있는 사람(`inmc.vanish.see`)에게만.
+- "다른 플레이어 숨기기"(`Visibility`)는 그대로 — `hidePlayer`/`showPlayer` 는 플러그인마다 따로 세므로 투명 기능이 숨긴 것을 풀지 않는다.
+
 ## 미배포 — 어드민 허브에 던전·디스코드 · 도움말은 권한대로(2026-10-08)
 
 - `/메뉴 어드민` 에 던전(`/던전 관리 화면`)·디스코드(`/디스코드 관리 상태`) 버튼 — 15개.

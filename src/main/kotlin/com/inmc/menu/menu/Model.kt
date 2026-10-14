@@ -10,7 +10,6 @@ enum class Screen(val id: String, val label: String) {
     SETTINGS("settings", "개인 설정"),
     ATTENDANCE("attendance", "출석"),
     RTP("rtp", "랜덤 TP"),
-    SPAWN("spawn", "스폰으로 이동"),
     ;
 
     companion object {
@@ -30,7 +29,7 @@ sealed interface Action {
         PLAYER("player", "명령어(본인)", "누른 사람이 실행. 예: 상점 · 배낭"),
         CONSOLE("console", "명령어(콘솔)", "콘솔이 실행. {플레이어} = 누른 사람"),
         MENU("menu", "메뉴 열기", "메뉴 이름. 예: contents"),
-        SCREEN("screen", "내장 화면", "settings · attendance · rtp · spawn"),
+        SCREEN("screen", "내장 화면", "settings · attendance · rtp"),
         MESSAGE("message", "메시지", "누른 사람에게 보낼 글(MiniMessage)"),
         CLOSE("close", "닫기", "값 없음"),
         ;
@@ -63,6 +62,10 @@ sealed interface Action {
 
     companion object {
 
+        /** 옛 `screen: spawn` 값과 그것을 대신하는 명령(inmc-essentials `/스폰`). */
+        const val LEGACY_SPAWN_SCREEN = "spawn"
+        const val SPAWN_COMMAND = "스폰"
+
         /** 못 읽으면 null(그 줄만 버린다). */
         fun decode(raw: String): Action? {
             val text = raw.trim()
@@ -78,7 +81,8 @@ sealed interface Action {
                 Type.PLAYER -> value.removePrefix("/").takeIf { it.isNotBlank() }?.let(::PlayerCommand)
                 Type.CONSOLE -> value.removePrefix("/").takeIf { it.isNotBlank() }?.let(::ConsoleCommand)
                 Type.MENU -> value.takeIf { it.isNotBlank() }?.let(::OpenMenu)
-                Type.SCREEN -> Screen.parse(value)?.let(::OpenScreen)
+                // 옛 내장 화면 spawn(2026-10-10 스폰은 inmc-essentials 로) — 버려지지 않게 `/스폰` 명령 버튼으로 읽는다(다음 저장 때 player: 스폰).
+                Type.SCREEN -> if (value.equals(LEGACY_SPAWN_SCREEN, ignoreCase = true)) PlayerCommand(SPAWN_COMMAND) else Screen.parse(value)?.let(::OpenScreen)
                 Type.MESSAGE -> value.takeIf { it.isNotBlank() }?.let(::Message)
                 Type.CLOSE -> Close
             }

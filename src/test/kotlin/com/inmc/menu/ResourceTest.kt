@@ -45,7 +45,7 @@ class ResourceTest {
         val used = Regex(""""(inmcmenu\.[a-z.-]+)"""").findAll(code).map { it.groupValues[1] }.toSet()
         assertTrue(used.size >= 5, "권한을 못 읽었다: $used")
         for (node in used) assertTrue(Regex("""(?m)^  ${Regex.escape(node)}:""").containsMatchIn(yml), "선언 안 된 권한 $node")
-        for (open in listOf(Hub.USE, Hub.SPAWN, Hub.RTP, Hub.ATTENDANCE)) {
+        for (open in listOf(Hub.USE, Hub.RTP, Hub.ATTENDANCE)) {
             assertTrue(Regex("""(?ms)^  ${Regex.escape(open)}:\s*\n\s+description:[^\n]*\n\s+default: true""").containsMatchIn(yml), "$open 은 누구나")
         }
     }

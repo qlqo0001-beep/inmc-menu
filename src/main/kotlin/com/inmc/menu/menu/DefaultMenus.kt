@@ -49,7 +49,7 @@ object DefaultMenus {
             button("money", 6, 0, 1, 1, Material.GOLD_NUGGET, "<gold>돈</gold>", listOf("<gray>잔고 · 송금 · 순위</gray>"), cmd("돈")),
             button("equipment", 7, 0, 1, 1, Material.DIAMOND_CHESTPLATE, "<aqua>장비</aqua>", listOf("<gray>장신구 · 부적 · 유물 칸</gray>"), cmd("장비")),
             button("sell", 8, 0, 1, 1, Material.HOPPER, "<green>판매</green>", listOf("<gray>가방의 물건을 팝니다.</gray>"), cmd("판매")),
-            button("spawn", 0, 1, 3, 2, Material.RED_BED, "<green>스폰</green>", listOf("<gray>서버 스폰으로 이동합니다.</gray>"), Action.OpenScreen(Screen.SPAWN)),
+            button("spawn", 0, 1, 3, 2, Material.RED_BED, "<green>스폰</green>", listOf("<gray>서버 스폰으로 이동합니다.</gray>"), cmd("스폰")),
             button("rtp", 3, 1, 3, 2, Material.ENDER_PEARL, "<aqua>랜덤 TP</aqua>", listOf("<gray>월드를 골라 아무도 안 가 본 곳으로.</gray>"), Action.OpenScreen(Screen.RTP)),
             button("shop", 6, 1, 3, 2, Material.EMERALD, "<green>상점</green>", listOf("<gray>서버 상점에서 사고팝니다.</gray>"), cmd("상점")),
             button("auction", 0, 3, 3, 2, Material.GOLD_INGOT, "<yellow>경매장</yellow>", listOf("<gray>플레이어끼리 사고팝니다.</gray>"), cmd("경매장")),

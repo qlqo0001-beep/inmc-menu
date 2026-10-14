@@ -29,7 +29,6 @@ class MenuPlugin : JavaPlugin() {
         hub.economy.setup()
         hub.menus.loadNow()
         hub.rtpWorlds.loadNow()
-        hub.spawn.loadNow()
         hub.attendance.loadBoards()
         hub.art.load()
         hub.settings.register()
@@ -38,11 +37,9 @@ class MenuPlugin : JavaPlugin() {
         val manager = server.pluginManager
         manager.registerEvents(PlayerListener(hub), this)
         manager.registerEvents(com.inmc.menu.listener.WarmupListener(hub), this)
-        manager.registerEvents(com.inmc.menu.listener.SpawnListener(hub), this)
         manager.registerEvents(kr.inmc.core.listener.MenuListener(hub), this)
         MenuCommand(hub, this).register(this)
         com.inmc.menu.command.RtpCommand(hub).register(this)
-        com.inmc.menu.command.SpawnCommand(hub).register(this)
         com.inmc.menu.command.AttendanceCommand(hub).register(this)
         // 지역 플러그인(WorldGuard·Lands)은 우리보다 늦게 켜질 수 있다 — 서버가 다 켜진 뒤 첫 틱에 잇는다.
         server.globalRegionScheduler.run(this) { hub.rtp.regions.setup(this) }
@@ -63,7 +60,6 @@ class MenuPlugin : JavaPlugin() {
         if (!::hub.isInitialized) return
         if (::ticker.isInitialized) ticker.stop()
         hub.rtp.shutdown()
-        hub.spawn.shutdown()
         hub.attendance.shutdown()
         hub.settings.unregister()
         hub.visibility.showAll()
@@ -90,7 +86,6 @@ class MenuPlugin : JavaPlugin() {
             hub.messages = Messages.from(messages)
             hub.menus.loadNow()
             hub.rtpWorlds.loadNow()
-            hub.spawn.loadNow()
             hub.attendance.loadBoards()
             hub.visibility.refreshAll()
             then()
