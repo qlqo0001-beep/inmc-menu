@@ -33,6 +33,14 @@ class AttendanceService(private val hub: Hub) {
     private val folder get() = hub.io.file("attendance")
     private val dataFolder get() = hub.io.file("attendance-data")
     private val data = HashMap<UUID, PlayerData>()
+
+    /**
+     * 올라와 있는 기록의 칸(모드 — core `Realms`, 2026-10-15). 출석·못 받은 보상 실물이 모드마다 따로라(기능 `menu.attendance`)
+     * 파일은 `attendance-data/<uuid>@<모드>.yml`(같이 쓰기·모드 없음이면 옛 `<uuid>.yml`). 쓰기는 **읽은 칸**에 한다.
+     */
+    private val scopes = HashMap<UUID, String>()
+
+    private fun scopeNow(id: UUID): String = kr.inmc.core.integration.Realms.scope(FEATURE, id)
     private var lastDay: LocalDate? = null
 
     // --- 출석판 -------------------------------------------------------------------------------
@@ -82,7 +90,7 @@ class AttendanceService(private val hub: Hub) {
      */
     fun resetPlayer(boardId: String, target: UUID, then: (Boolean) -> Unit) {
         data[target]?.let { return then(forgetLoaded(it, boardId)) }
-        val file = file(target)
+        val file = file(target, scopeNow(target))
         hub.io.async({ PlayerData.forget(file, boardId) }) { removed ->
             val joined = data[target]?.let { forgetLoaded(it, boardId) } ?: false
             then(removed || joined)
@@ -111,13 +119,18 @@ class AttendanceService(private val hub: Hub) {
 
     fun data(player: UUID): PlayerData? = data[player]
 
-    private fun file(id: UUID) = java.io.File(dataFolder, "$id.yml")
+    private fun file(id: UUID, scope: String) = java.io.File(dataFolder, kr.inmc.core.integration.Realms.key(id.toString(), scope) + ".yml")
 
     fun onJoin(player: Player) {
         val id = player.uniqueId
-        hub.io.async({ PlayerData.read(id, file(id)) }) { loaded ->
+        val scope = scopeNow(id)
+        hub.io.async({ PlayerData.read(id, file(id, scope)) }) { loaded ->
             val online = Bukkit.getPlayer(id) ?: return@async
+            // 그 사이 모드가 바뀌었으면 이 읽기는 버리고 새 칸으로 다시.
+            if (scopeNow(id) != scope) return@async onJoin(online)
+            if (data.containsKey(id)) return@async
             data[id] = loaded
+            scopes[id] = scope
             autoCheck(online)
             remind(online)
         }
@@ -125,6 +138,15 @@ class AttendanceService(private val hub: Hub) {
 
     fun onQuit(player: Player) {
         data.remove(player.uniqueId)?.let { write(it) }
+        scopes.remove(player.uniqueId)
+    }
+
+    /** 모드가 바뀌었다(또는 토글) — 읽은 칸이 지금 칸과 다르면 옛 칸을 쓰고 새 칸을 읽는다. */
+    fun onRealm(player: Player) {
+        val id = player.uniqueId
+        if (data.containsKey(id) && scopes[id] == scopeNow(id)) return
+        onQuit(player)
+        onJoin(player)
     }
 
     /** `/reload` 뒤 — 이미 들어와 있는 사람. */
@@ -259,20 +281,24 @@ class AttendanceService(private val hub: Hub) {
     }
 
     private fun write(pd: PlayerData) {
-        runCatching { pd.write(file(pd.id)) }.onFailure { hub.logger.severe("출석 기록을 쓰지 못했습니다(${pd.id}): ${it.message}") }
+        runCatching { pd.write(file(pd.id, scopes[pd.id] ?: scopeNow(pd.id))) }.onFailure { hub.logger.severe("출석 기록을 쓰지 못했습니다(${pd.id}): ${it.message}") }
     }
 
     /** 끌 때 — 접속한 사람의 접속 분을 쓴다(기록은 이미 써 두었다). */
     fun shutdown() {
         for (pd in data.values) write(pd)
         data.clear()
+        scopes.clear()
     }
 
     /** 화면용 — 못 받은 보상. */
     fun pending(player: UUID): List<ItemStack> = data[player]?.pending.orEmpty()
 
-    private companion object {
-        const val MAX_STACKS = 64
+    companion object {
+        /** core `Realms` 기능 열쇠 — 출석 기록(못 받은 보상 실물 포함)을 모드마다 따로 둘지. */
+        const val FEATURE = "menu.attendance"
+
+        private const val MAX_STACKS = 64
     }
 }
 

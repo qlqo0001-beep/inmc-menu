@@ -32,6 +32,11 @@ class MenuPlugin : JavaPlugin() {
         hub.attendance.loadBoards()
         hub.art.load()
         hub.settings.register()
+        // 모드(inmc-worlds)의 기능 토글에 출석을 올린다(core Realms, 2026-10-15).
+        kr.inmc.core.integration.Realms.register(kr.inmc.core.integration.Realms.Feature(
+            com.inmc.menu.attend.AttendanceService.FEATURE, "플레이어 메뉴", "출석", org.bukkit.Material.CLOCK,
+            listOf("출석판 기록 · 가방이 차서 못 받은 보상"),
+        ))
         hookPlaceholders()
 
         val manager = server.pluginManager
@@ -62,6 +67,7 @@ class MenuPlugin : JavaPlugin() {
         hub.rtp.shutdown()
         hub.attendance.shutdown()
         hub.settings.unregister()
+        kr.inmc.core.integration.Realms.unregisterAll("플레이어 메뉴")
         hub.visibility.showAll()
         if (papi != null && Text.papiResolver === papi) Text.papiResolver = null
         hub.menus.flushBlocking()

@@ -42,6 +42,22 @@ class PlayerListener(private val hub: Hub) : Listener {
         hub.visibility.refreshTarget(event.player)
     }
 
+    /** 모드가 바뀌었다(core `RealmChangeEvent` — inmc-worlds) — 출석 기록을 그 모드의 것으로. */
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onRealm(event: kr.inmc.core.event.RealmChangeEvent) {
+        hub.attendance.onRealm(event.player)
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    fun onRealmFeature(event: kr.inmc.core.event.RealmFeatureChangeEvent) {
+        if (event.key != com.inmc.menu.attend.AttendanceService.FEATURE) return
+        for (player in org.bukkit.Bukkit.getOnlinePlayers()) {
+            val holder = player.openInventory.topInventory.holder
+            if (holder is kr.inmc.core.gui.Menu && holder.owner === hub) player.closeInventory()
+            hub.attendance.onRealm(player)
+        }
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     fun onQuit(event: PlayerQuitEvent) {
         hub.packLoaded.remove(event.player.uniqueId)
