@@ -16,6 +16,7 @@ import com.inmc.menu.util.Ph
 import kr.inmc.core.gui.ConfirmMenu
 import kr.inmc.core.gui.DialogForm
 import kr.inmc.core.gui.Icon
+import kr.inmc.core.gui.ItemInputMenu
 import kr.inmc.core.gui.Paging
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -327,11 +328,13 @@ class BoardEditor(hub: Hub, viewer: Player, private val boardId: String) : Menu(
         set(10, Icon.of(Material.NAME_TAG, "<yellow>이름</yellow>", "<gray>지금: </gray>${b.name}", "", "<yellow>▶ 클릭: 바꾸기</yellow>")) {
             ask(DialogForm("<yellow>출석판 이름</yellow>").text("name", "보이는 이름(MiniMessage)", b.name)) { v -> save { it.copy(name = v.text("name").ifBlank { it.id }) } }
         }
-        set(11, named(runCatching { ItemStack(b.icon) }.getOrElse { ItemStack(Material.CLOCK) }, "<yellow>그림</yellow>",
-            listOf("<gray>고르기 화면의 그림.</gray>", "", "<yellow>▶ 클릭: 손에 든 것으로</yellow>"), null, viewer)) {
-            val hand = viewer.inventory.itemInMainHand
-            if (hand.type.isAir) return@set hub.messages.send(viewer, "hand-empty")
-            save { it.copy(icon = hand.type) }
+        val icon = runCatching { ItemStack(b.icon) }.getOrElse { ItemStack(Material.CLOCK) }
+        set(11, named(icon.clone(), "<yellow>그림</yellow>",
+            listOf("<gray>고르기 화면의 그림.</gray>", "", "<yellow>▶ 클릭: 아이템 올리기</yellow>"), null, viewer)) {
+            ItemInputMenu(hub, viewer, "출석판 그림", listOf("<gray>고르기 화면의 그림(재질만 씁니다).</gray>"), initial = icon, back = { show() }) { item ->
+                save { it.copy(icon = item.type) }
+                show()
+            }.show()
         }
         set(12, toggleIcon("켜짐", b.enabled, "<gray>끄면 화면에도 안 나오고 출석도 안 됩니다.</gray>")) { save { it.copy(enabled = !it.enabled) } }
         set(13, valueIcon(Material.COMPASS, "방식", b.mode.label, "<gray>${b.mode.help}</gray>")) {

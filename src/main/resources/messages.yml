@@ -9,7 +9,6 @@ no-permission: "<red>권한이 없습니다.</red>"
 reloaded: "<green>다시 불러왔습니다. 메뉴 {count}개.</green>"
 invalid-id: "<red>이름은 소문자 영문·숫자·한글·_- 만, 32자까지입니다: {value}</red>"
 already-exists: "<red>'{value}' 은(는) 이미 있습니다.</red>"
-hand-empty: "<red>손에 아이템을 들고 누르세요.</red>"
 
 # --- 메뉴 ---
 menu-missing: "<red>'{value}' 메뉴가 없습니다. /메뉴 편집 으로 만드세요.</red>"
@@ -66,8 +65,8 @@ attend-done-calendar: "{value} <green>출석 완료!</green> <gray>(이달 {coun
 attend-done-streak: "{value} <green>출석 완료!</green> <gray>(연속 {count}일째)</gray>"
 attend-done-total: "{value} <green>출석 완료!</green> <gray>(총 {count}번째)</gray>"
 attend-bonus: "{value} <gold>— 이달 {count}일 출석 보상!</gold>"
-attend-mailed: "<yellow>가방이 가득 차 보상 {count}개를 우편으로 보냈습니다 — /우편 에서 받으세요.</yellow>"
 attend-pending: "<yellow>가방이 가득 차 보상 {count}개를 보관했습니다 — /출석 에서 받으세요.</yellow>"
+attend-mailed: "<yellow>가방이 가득 차 보상 {count}개를 우편으로 보냈습니다 — /우편 에서 받으세요.</yellow>"
 attend-claimed: "<green>보관된 보상 {count}개를 받았습니다.</green>"
 attend-claim-left: "<yellow>가방이 가득 차 {count}개가 남았습니다.</yellow>"
 attend-board-created: "<green>'{value}' 출석판을 만들었습니다.</green>"

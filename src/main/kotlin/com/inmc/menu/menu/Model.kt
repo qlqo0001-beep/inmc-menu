@@ -113,7 +113,7 @@ data class ButtonDef(
     val height: Int = 1,
     val name: String,
     val lore: List<String> = emptyList(),
-    /** 리소스팩을 안 받은 사람에게 보이는 아이템(손에 든 것으로 정한다). */
+    /** 리소스팩을 안 받은 사람에게 보이는 아이템(편집기에서 올린 것으로 정한다). */
     val icon: StoredItem,
     /** 배경에 그릴 그림의 이름(기본 그림 또는 `art/` 의 png). 비우면 판만. */
     val art: String = "",

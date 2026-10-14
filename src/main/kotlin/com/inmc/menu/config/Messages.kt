@@ -23,7 +23,6 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
             "reloaded" to "<green>다시 불러왔습니다. 메뉴 {count}개.</green>",
             "invalid-id" to "<red>이름은 소문자 영문·숫자·한글·_- 만, 32자까지입니다: {value}</red>",
             "already-exists" to "<red>'{value}' 은(는) 이미 있습니다.</red>",
-            "hand-empty" to "<red>손에 아이템을 들고 누르세요.</red>",
 
             // --- 메뉴 ---------------------------------------------------------------
             "menu-missing" to "<red>'{value}' 메뉴가 없습니다. /메뉴 편집 으로 만드세요.</red>",
@@ -79,8 +78,8 @@ class Messages(values: Map<String, String>) : MessageCatalog<Ph>(values, DEFAULT
             "attend-done-streak" to "{value} <green>출석 완료!</green> <gray>(연속 {count}일째)</gray>",
             "attend-done-total" to "{value} <green>출석 완료!</green> <gray>(총 {count}번째)</gray>",
             "attend-bonus" to "{value} <gold>— 이달 {count}일 출석 보상!</gold>",
-            "attend-mailed" to "<yellow>가방이 가득 차 보상 {count}개를 우편으로 보냈습니다 — /우편 에서 받으세요.</yellow>",
             "attend-pending" to "<yellow>가방이 가득 차 보상 {count}개를 보관했습니다 — /출석 에서 받으세요.</yellow>",
+            "attend-mailed" to "<yellow>가방이 가득 차 보상 {count}개를 우편으로 보냈습니다 — /우편 에서 받으세요.</yellow>",
             "attend-claimed" to "<green>보관된 보상 {count}개를 받았습니다.</green>",
             "attend-claim-left" to "<yellow>가방이 가득 차 {count}개가 남았습니다.</yellow>",
             "attend-board-created" to "<green>'{value}' 출석판을 만들었습니다.</green>",

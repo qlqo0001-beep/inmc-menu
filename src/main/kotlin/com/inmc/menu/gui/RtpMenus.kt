@@ -8,6 +8,7 @@ import com.inmc.menu.rtp.Shape
 import com.inmc.menu.util.Ph
 import kr.inmc.core.gui.DialogForm
 import kr.inmc.core.gui.Icon
+import kr.inmc.core.gui.ItemInputMenu
 import kr.inmc.core.gui.Paging
 import kr.inmc.core.util.Durations
 import kr.inmc.core.util.Text
@@ -82,11 +83,7 @@ class RtpAdminMenu(hub: Hub, viewer: Player) : Menu(hub, viewer, SIZE, "랜덤 T
             val settings = hub.rtpWorlds.get(name) ?: loaded?.let { hub.rtpWorlds.orDefault(it) } ?: continue
             set(slot, icon(settings, loaded)) { event ->
                 when {
-                    event.isShiftClick && event.isLeftClick -> {
-                        val hand = viewer.inventory.itemInMainHand
-                        if (hand.type.isAir) return@set hub.messages.send(viewer, "hand-empty")
-                        save(settings.copy(icon = hand.type))
-                    }
+                    event.isShiftClick && event.isLeftClick -> iconInput(name, settings)
                     event.isShiftClick && event.isRightClick -> {
                         hub.rtp.clearMarks(name)
                         hub.messages.send(viewer, "rtp-marks-cleared", Ph.of().world(name))
@@ -120,7 +117,7 @@ class RtpAdminMenu(hub: Hub, viewer: Player) : Menu(hub, viewer, SIZE, "랜덤 T
             add("")
             add("<yellow>▶ 클릭: 고치기</yellow>")
             add("<yellow>▶ 우클릭: 켜기/끄기</yellow>")
-            add("<yellow>▶ Shift+좌클릭: 손에 든 것을 그림으로</yellow>")
+            add("<yellow>▶ Shift+좌클릭: 아이콘 올리기</yellow>")
             add("<red>▶ Shift+우클릭: 실패 구역 지우기</red> <dark_gray>(지형을 바꿨을 때)</dark_gray>")
         }
         val stack = named(stackOf(settings.icon), "<white>${settings.world}</white>", lore, null, viewer)
@@ -131,6 +128,16 @@ class RtpAdminMenu(hub: Hub, viewer: Player) : Menu(hub, viewer, SIZE, "랜덤 T
     private fun save(settings: RtpWorld) {
         hub.rtpWorlds.put(settings)
         refresh()
+    }
+
+    /** 월드 아이콘 — 올린 아이템의 재질. 올리는 사이 다른 설정이 바뀌었을 수 있어 등록할 때 다시 읽는다. */
+    private fun iconInput(name: String, settings: RtpWorld) {
+        ItemInputMenu(hub, viewer, "$name 아이콘", listOf("<gray>/야생 화면에 보이는 아이템(재질만 씁니다).</gray>"),
+            initial = stackOf(settings.icon), back = { show() }) { item ->
+            val now = hub.rtpWorlds.get(name) ?: Bukkit.getWorld(name)?.let { hub.rtpWorlds.orDefault(it) } ?: settings
+            hub.rtpWorlds.put(now.copy(icon = item.type))
+            show()
+        }.show()
     }
 
     private fun edit(w: RtpWorld) {

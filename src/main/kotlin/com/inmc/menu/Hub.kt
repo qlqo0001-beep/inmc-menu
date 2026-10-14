@@ -44,7 +44,7 @@ class Hub(override val plugin: JavaPlugin) : InmcHost {
 
     val mmoItems = MMOItemsHook(logger)
 
-    /** 버튼 아이콘(손에 든 것 — 커스텀아이템·MMOItems 그대로). */
+    /** 버튼 아이콘(올린 것 — 커스텀아이템·MMOItems 그대로). */
     val resolver = ItemResolver(mmoItems, customItems, logger)
 
     val menus = MenuStore(this)

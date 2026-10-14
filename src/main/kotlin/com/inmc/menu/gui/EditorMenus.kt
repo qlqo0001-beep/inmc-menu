@@ -9,14 +9,13 @@ import com.inmc.menu.util.Ph
 import kr.inmc.core.gui.DialogForm
 import kr.inmc.core.gui.Editors
 import kr.inmc.core.gui.Icon
-import kr.inmc.core.item.ItemRef
-import kr.inmc.core.item.StoredItem
+import kr.inmc.core.gui.ItemInputMenu
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 /**
- * 메뉴 편집 — 메뉴를 **그대로** 보여 주고 칸을 눌러 고친다. 버튼을 누르면 그 버튼의 설정, 빈 칸을 누르면 거기에 새 버튼(손에 든 것이 아이콘),
+ * 메뉴 편집 — 메뉴를 **그대로** 보여 주고 칸을 눌러 고친다. 버튼을 누르면 그 버튼의 설정, 빈 칸을 누르면 거기에 새 버튼(아이콘은 [ItemInputMenu] 에 올린 것),
  * 빈 칸을 Shift+클릭하면 메뉴 설정(제목·줄 수).
  *
  * 편집 화면은 정의가 아니라 **id 를 들고 있다** — 정의는 고칠 때마다 새 객체라, 옛 객체를 붙들면 두 번째 편집이 첫 번째를 지운다(커스텀아이템 규칙 24).
@@ -44,19 +43,27 @@ class EditorMenu(hub: Hub, viewer: Player, private val menuId: String) :
         for (slot in 0 until def.rows * 9) {
             if (def.buttonAt(slot) != null) continue
             set(slot, Icon.of(Material.BLACK_STAINED_GLASS_PANE, "<dark_gray>빈 칸 (${slot % 9 + 1}, ${slot / 9 + 1})</dark_gray>",
-                "<yellow>▶ 클릭: 여기에 새 버튼</yellow>", "<gray>손에 든 아이템이 아이콘이 됩니다.</gray>", "<yellow>▶ Shift+클릭: 메뉴 설정</yellow>")) { event ->
-                if (event.isShiftClick) settings(def) else create(def, slot)
+                "<yellow>▶ 클릭: 여기에 새 버튼</yellow>", "<gray>아이콘으로 쓸 아이템을 올립니다.</gray>", "<yellow>▶ Shift+클릭: 메뉴 설정</yellow>")) { event ->
+                if (event.isShiftClick) settings(def) else create(slot)
             }
         }
     }
 
-    private fun create(def: MenuDef, slot: Int) {
-        val hand = viewer.inventory.itemInMainHand
-        val icon = if (hand.type.isAir) StoredItem(ItemRef.parse("minecraft:paper"), Material.PAPER) else hub.resolver.capture(hand)
-        val id = generateSequence(1) { it + 1 }.map { "b$it" }.first { id -> def.buttons.none { it.id == id } }
-        val button = ButtonDef(id = id, col = slot % 9, row = slot / 9, name = "<white>새 버튼</white>", icon = icon)
-        hub.menus.put(def.with(button))
-        ButtonEditor(hub, viewer, menuId, id).show()
+    /** 아이콘을 올리고 [등록] 하면 그 칸에 새 버튼. 처음엔 종이가 올라가 있다(그대로 등록하면 종이 아이콘). */
+    private fun create(slot: Int) {
+        ItemInputMenu(hub, viewer, "새 버튼 아이콘", listOf("<gray>리소스팩을 안 받은 사람에게 보이는 아이템.</gray>"),
+            initial = ItemStack(Material.PAPER), back = { show() }) { item ->
+            val def = hub.menus.get(menuId) ?: return@ItemInputMenu viewer.closeInventory()
+            val id = generateSequence(1) { it + 1 }.map { "b$it" }.first { id -> def.buttons.none { it.id == id } }
+            val button = ButtonDef(id = id, col = slot % 9, row = slot / 9, name = "<white>새 버튼</white>", icon = hub.resolver.capture(item))
+            // 올리는 사이 그 칸에 다른 버튼이 생겼을 수 있다.
+            if (!def.canPlace(button)) {
+                hub.messages.send(viewer, "editor-blocked")
+                return@ItemInputMenu show()
+            }
+            hub.menus.put(def.with(button))
+            ButtonEditor(hub, viewer, menuId, id).show()
+        }.show()
     }
 
     private fun settings(def: MenuDef) {
@@ -115,13 +122,12 @@ class ButtonEditor(hub: Hub, viewer: Player, private val menuId: String, private
                 save { it.copy(lore = v.text("lore").lines().map(String::trimEnd).dropLastWhile(String::isEmpty)) }
             }
         }
-        set(SLOT_ICON, Icon.of(button.icon.material, "<yellow>아이콘</yellow>", "<gray>리소스팩을 안 받은 사람에게 보이는 아이템.</gray>", "", "<yellow>▶ 손에 들고 클릭</yellow>")) {
-            val hand = viewer.inventory.itemInMainHand
-            if (hand.type.isAir) {
-                hub.messages.send(viewer, "hand-empty")
-                return@set
-            }
-            if (save { it.copy(icon = hub.resolver.capture(hand)) }) refresh()
+        set(SLOT_ICON, Icon.of(button.icon.material, "<yellow>아이콘</yellow>", "<gray>리소스팩을 안 받은 사람에게 보이는 아이템.</gray>", "", "<yellow>▶ 클릭: 아이템 올리기</yellow>")) {
+            ItemInputMenu(hub, viewer, "버튼 아이콘", listOf("<gray>리소스팩을 안 받은 사람에게 보이는 아이템.</gray>"),
+                initial = hub.resolver.icon(button.icon).stack.clone().also { it.amount = 1 }, back = { show() }) { item ->
+                save { it.copy(icon = hub.resolver.capture(item)) }
+                show()
+            }.show()
         }
         set(SLOT_ART, valueIcon(Material.PAINTING, "그림", button.art.ifBlank { "(판만)" },
             "<gray>리소스팩 화면의 배경에 그릴 그림 이름.</gray>", "<gray>기본 그림 이름이나 plugins/inmc-menu/art/ 의 png 이름.</gray>",
